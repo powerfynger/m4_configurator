@@ -173,35 +173,35 @@ void change_config() {
         case '1':
             system("cls");
             if (current_config.tactical_bracing == '1') {
-                printf("Текущее значение: Установлен");
+                printf("Текущее значение >> Установлен");
             }
             else {
-                printf("Текущее значение: Отсутсвует");
+                printf("Текущее значение >> Отсутсвует");
             }
             change_tactical_bracing();
             change++;
             break;
         case '2':
             system("cls");
-            printf("Текущее значение: %s", current_config.scope.base);
+            printf("Текущее значение >> %s", current_config.scope.base);
             change_scope();
             change++;
             break;
         case '3':
             system("cls");
-            printf("Текущее значение: %s", current_config.barrel);
+            printf("Текущее значение >> %s", current_config.barrel);
             change_barrel();
             change++;
             break;
         case '4':
             system("cls");
-            printf("Текущее значение: %s", current_config.underbarrel_mods);
+            printf("Текущее значение >> %s", current_config.underbarrel_mods);
             change_underbarrel_mods();
             change++;
             break;
         case '5':
             system("cls");
-            printf("Текущее значение: %s", current_config.trigger);
+            printf("Текущее значение >> %s", current_config.trigger);
             change_trigger();
             change++;
             break;
@@ -219,25 +219,25 @@ void change_config() {
             switch (choice) {
             case '1':
                 system("cls");
-                printf("Текущее значение: %s", current_config.handle);
+                printf("Текущее значение >> %s", current_config.handle);
                 change_handle();
                 change++;
                 break;
             case '2':
                 system("cls");
-                printf("Текущее значение: %s", current_config.stock);
+                printf("Текущее значение >> %s", current_config.stock);
                 change_stock();
                 change++;
                 break;
             case '3':
                 system("cls");
-                printf("Текущее значение: %s", current_config.rifle_case);
+                printf("Текущее значение >> %s", current_config.rifle_case);
                 change_case();
                 change++;
                 break;
             case '4':
                 system("cls");
-                printf("Текущее значение: %s", current_config.magazine.size);
+                printf("Текущее значение >> %s", current_config.magazine.size);
                 change_magazine();
                 change++;
                 break;
@@ -410,7 +410,7 @@ void check_prices() {
         printf("Доплата за тактическое крепление : %d\n", item_price("Тактическое крепление"));
         current_config.price += item_price("Тактическое крепление");
     }
-    if (strcmp(current_config.scope.base, "Нет")) {
+    if (strcmp(current_config.scope.base, "")) {
         printf("Доплата за прицел (%s) : %d\n", current_config.scope.base,item_price(current_config.scope.base));
         current_config.price += item_price(current_config.scope.base);
         if (current_config.scope.approach == '4') {
@@ -422,7 +422,7 @@ void check_prices() {
         printf("Доплата за ствол (%s) : %d\n", current_config.barrel,item_price(current_config.barrel));
         current_config.price += item_price(current_config.barrel);
     }
-    if (strcmp(current_config.barrel_mods, "Нет")) {
+    if (strcmp(current_config.barrel_mods, "")) {
         printf("Доплата за модификацию ствола (%s) : %d\n", current_config.barrel_mods, item_price(current_config.barrel_mods));
         current_config.price += item_price(current_config.barrel_mods);
     }
@@ -434,15 +434,15 @@ void check_prices() {
             current_config.price += item_price("Держатель магазина");
         }
     }
-    if (strcmp(current_config.underbarrel_mods, "Нет")) {
+    if (strcmp(current_config.underbarrel_mods, "")) {
         printf("Доплата за модификацию (%s) : %d\n", current_config.underbarrel_mods, item_price(current_config.underbarrel_mods));
         current_config.price += item_price(current_config.underbarrel_mods);
     }
-    if (strcmp(current_config.handle, "Нет")) {
+    if (strcmp(current_config.handle, "")) {
         printf("Доплата за модификацию рукояти (%s) : %d\n", current_config.handle, item_price(current_config.handle));
         current_config.price += item_price(current_config.handle);
     }
-    if (strcmp(current_config.stock, "Стандартный")) {
+    if (strcmp(current_config.stock, "")) {
         printf("Доплата за приклад (%s) : %d\n", current_config.stock, item_price(current_config.stock));
         current_config.price += item_price(current_config.stock);
         if (current_config.tube) {
@@ -450,11 +450,11 @@ void check_prices() {
             current_config.price += item_price("С буферизацией отдачи");
         }
     }
-    if (strcmp(current_config.rifle_case, "Нет")) {
+    if (strcmp(current_config.rifle_case, "")) {
         printf("Доплата за чехол (%s) : %d\n", current_config.rifle_case, item_price(current_config.rifle_case));
         current_config.price += item_price(current_config.rifle_case);
     }
-    if (strcmp(current_config.magazine.size, "Стандартный")) {
+    if (strcmp(current_config.magazine.size, "")) {
         printf("Доплата за магазин (%s) : %d\n", current_config.magazine.size, item_price(current_config.magazine.size));
         current_config.price += item_price(current_config.magazine.size);
     }
@@ -607,7 +607,7 @@ void change_scope() {
         choice = safe_input();
         switch (choice) {
         case '1':
-            strcpy(current_config.scope.base, "Нет");
+            strcpy(current_config.scope.base, "");
             change++;
             break;
         case '2':
@@ -720,7 +720,7 @@ void change_barrel() {
                 choice = safe_input();
                 switch (choice) {
                 case '1':
-                    strcpy(current_config.barrel_mods, "Нет");
+                    strcpy(current_config.barrel_mods, "");
                     change_tmp++;
                     break;
                 case '2':
@@ -746,7 +746,7 @@ void change_barrel() {
             choice = safe_input();
             switch (choice) {
             case '1':
-                strcpy(current_config.barrel_mods, "Нет");
+                strcpy(current_config.barrel_mods, "");
                 change_tmp++;
                 break;
             case '2':
@@ -835,7 +835,7 @@ void change_underbarrel_mods() {
         choice = safe_input();
         switch (choice) {
         case '1':
-            strcpy(current_config.underbarrel_mods, "Нет");
+            strcpy(current_config.underbarrel_mods, "");
             change++;
             break;
         case '2':
@@ -869,7 +869,7 @@ void change_handle() {
         if (!strcmp(current_config.underbarrel_mods, "Гранатомёт М203")) {
             puts("Невозможно установить опору, из-за выбранной модификации(Гранатомёт М203).");
             system("pause");
-            strcpy(current_config.handle, "Нет");
+            strcpy(current_config.handle, "");
             change++;
             break;
             system("cls");
@@ -879,7 +879,7 @@ void change_handle() {
         choice = safe_input();
         switch (choice) {
         case '1':
-            strcpy(current_config.handle, "Нет");
+            strcpy(current_config.handle, "");
             change++;
             break;
         case '2':
@@ -909,7 +909,7 @@ void change_stock() {
         choice = safe_input();
         switch (choice) {
         case '1':
-            strcpy(current_config.stock, "Стандартный");
+            strcpy(current_config.stock, "");
             change++;
             break;
         case '2':
@@ -962,7 +962,7 @@ void change_case() {
         choice = safe_input();
         switch (choice) {
         case '2':
-            strcpy(current_config.rifle_case, "Нет");
+            strcpy(current_config.rifle_case, "");
             change++;
             break;
         case '1':
@@ -1016,7 +1016,7 @@ void change_magazine() {
         choice = safe_input();
         switch (choice) {
         case '1':
-            strcpy(current_config.magazine.size, "Стандартный");
+            strcpy(current_config.magazine.size, "");
             change++;
             break;
         case '2':
