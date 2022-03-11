@@ -44,7 +44,7 @@ struct m4 {
     char handle[64];
     char stock[20];
     char tube[64];
-    char rifle_case[20];
+    char rifle_case[30];
     struct magazine magazine;
     enum { in_progress, done } status;
     int price;
@@ -248,7 +248,6 @@ void change_config() {
     }
 }
 
-
 void save_config() {
     system("cls");
     puts("\t\t\tМеню сохранения конфигурации!\n");
@@ -335,28 +334,63 @@ void import_config() {
             system("pause");
             return;
         }
-        if (!fopen_s(&file, file_name, "r")) {
-            char line[200] = { '\0' };
-            fgets(line, sizeof(line), file);
-            if (strcmp(line, super_secret_code)) {
-                puts("Выбран неккоректный файл для чтения.");
-                system("pause");
-                return;
-            }
-            while (fgets(line, sizeof(line), file) != NULL) {
-                current_config.tactical_bracing = line[0] - '0';
-            }
-
+        char line[200] = { '\0' };
+        fgets(line, sizeof(line), file);
+        line[strlen(line) - 2] = '\0';
+        if (strcmp(line, super_secret_code)) {
+            puts("Выбран неккоректный файл для чтения.");
+            system("pause");
+            return;
         }
-
+        fgets(line, sizeof(line), file);
+        current_config.tactical_bracing = line[0] - '0';
+        fgets(line, sizeof(line), file);
+        line[strlen(line) - 2] = '\0';
+        strcpy_s(current_config.scope.base, sizeof(current_config.scope.base), line);
+        fgets(line, sizeof(line), file);
+        line[strlen(line) - 2] = '\0';
+        strcpy_s(current_config.scope.colour, sizeof(current_config.scope.colour), line);
+        fgets(line, sizeof(line), file);
+        line[strlen(line) - 2] = '\0';
+        strcpy_s(current_config.barrel, sizeof(current_config.barrel), line);
+        fgets(line, sizeof(line), file);
+        line[strlen(line) - 2] = '\0';
+        strcpy_s(current_config.barrel_mods, sizeof(current_config.barrel_mods), line);
+        fgets(line, sizeof(line), file);
+        line[strlen(line) - 2] = '\0';
+        strcpy_s(current_config.underbarrel_mods, sizeof(current_config.underbarrel_mods), line);
+        fgets(line, sizeof(line), file);
+        line[strlen(line) - 2] = '\0';
+        strcpy_s(current_config.trigger, sizeof(current_config.trigger), line);
+        fgets(line, sizeof(line), file);
+        current_config.magazine_holder = line[0];
+        fgets(line, sizeof(line), file);
+        line[strlen(line) - 2] = '\0';
+        strcpy_s(current_config.stock, sizeof(current_config.stock), line);
+        fgets(line, sizeof(line), file);
+        line[strlen(line) - 2] = '\0';
+        strcpy_s(current_config.tube, sizeof(current_config.tube), line);
+        fgets(line, sizeof(line), file);
+        line[strlen(line) - 2] = '\0';
+        strcpy_s(current_config.rifle_case, sizeof(current_config.rifle_case), line);
+        fgets(line, sizeof(line), file);
+        line[strlen(line) - 2] = '\0';
+        strcpy_s(current_config.magazine.size, sizeof(current_config.magazine.size), line);
+        current_config.status = done;
+        puts("Конфигурация успешно добавлена!");
+        system("pause");
+        fclose(file);
         return;
     }
 
-
-
 void check_prices() {
     system("cls");
-    puts("\t\tПросмотр цен на текущую конфигурацию!\n\nБазовая стоимость штурмовой винтовки M4 : 20.000 крышек.");
+    if (current_config.status == in_progress) {
+        puts("Текущая конфигурация не выбрана, стоимость рассчитать невозможно.\nДля создания/импорта конфигураций выберете соответствующие пункты меню.");
+        system("pause");
+        return;
+    }
+    puts("\t\tПросмотр цен на текущую конфигурацию!\n\nБазовая стоимость штурмовой винтовки M4 : 20.000 крышек.\n");
     current_config.price = 20000;
     if (current_config.tactical_bracing) {
         printf("Доплата за тактическое крепление : %d\n", item_price("Тактическое крепление"));
