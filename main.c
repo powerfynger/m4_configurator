@@ -29,7 +29,7 @@ struct scope {
 
 struct magazine {
     double callibre;
-    char size[20];
+    char size[30];
 };
 
 
@@ -172,26 +172,36 @@ void change_config() {
         switch (choice) {
         case '1':
             system("cls");
+            if (current_config.tactical_bracing == '1') {
+                printf("Текущее значение: Установлен");
+            }
+            else {
+                printf("Текущее значение: Отсутсвует");
+            }
             change_tactical_bracing();
             change++;
             break;
         case '2':
             system("cls");
+            printf("Текущее значение: %s", current_config.scope.base);
             change_scope();
             change++;
             break;
         case '3':
             system("cls");
+            printf("Текущее значение: %s", current_config.barrel);
             change_barrel();
             change++;
             break;
         case '4':
             system("cls");
+            printf("Текущее значение: %s", current_config.underbarrel_mods);
             change_underbarrel_mods();
             change++;
             break;
         case '5':
             system("cls");
+            printf("Текущее значение: %s", current_config.trigger);
             change_trigger();
             change++;
             break;
@@ -209,21 +219,25 @@ void change_config() {
             switch (choice) {
             case '1':
                 system("cls");
+                printf("Текущее значение: %s", current_config.handle);
                 change_handle();
                 change++;
                 break;
             case '2':
                 system("cls");
+                printf("Текущее значение: %s", current_config.stock);
                 change_stock();
                 change++;
                 break;
             case '3':
                 system("cls");
+                printf("Текущее значение: %s", current_config.rifle_case);
                 change_case();
                 change++;
                 break;
             case '4':
                 system("cls");
+                printf("Текущее значение: %s", current_config.magazine.size);
                 change_magazine();
                 change++;
                 break;
