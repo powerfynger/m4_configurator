@@ -10,12 +10,15 @@
 // 
 // 
 
+char* super_secret_code = "3746129736";
+
 typedef struct node {
     char name[30];
     int price;
     struct node* next;
 } node;
 
+node* list;
 
 
 struct scope {
@@ -25,7 +28,7 @@ struct scope {
 };
 
 struct magazine {
-    float callibre;
+    double callibre;
     char size[20];
 };
 
@@ -44,6 +47,7 @@ struct m4 {
     char rifle_case[20];
     struct magazine magazine;
     enum { in_progress, done } status;
+    int price;
 };
 
 int prices[10] = { 0 };
@@ -51,8 +55,13 @@ int prices[10] = { 0 };
 struct m4 current_config;
 
 
+
+void push(node* pr, char* name, int price);
+int item_price(char* name);
+void print_list(node* p);
 void create_config();
 void save_config();
+void import_config();
 void check_prices();
 void change_config();
 void exit_app();
@@ -85,11 +94,13 @@ int main() {
             break;
 
         case '2':
-            printf("%c", choice);
+            save_config();
+            system("cls");
             break;
 
         case '3':
-            printf("%c", choice);
+            import_config();
+            system("cls");
             break;
 
         case '4':
@@ -108,7 +119,7 @@ int main() {
             break;
 
         default:
-            puts("Выбор не распознан :(\nНажмите <enter> и повторите попытку...");
+            puts("Выбор не распознан :(");
             system("pause");
             break;
         }
@@ -132,16 +143,15 @@ void create_config() {
     change_magazine();
     current_config.magazine.callibre = 5.56;
     current_config.status = 1;
-    puts("Создание конфигурации штурмовой винтовки М4 успешно завершено!\nНажмите <enter>, чтобы продолжить...");
+    puts("Создание конфигурации штурмовой винтовки М4 успешно завершено!\n");
     system("pause");
 }
 
 void change_config() {
     char change = 0;
-    if (!current_config.status) {
+    if (current_config.status == in_progress) {
         system("cls");
-        puts("Текущая конфигурация не выбрана.\nВыберете пункт создания или импорта конфигураций в меню.\nНажмите\
-<enter>, чтобы продолжить...");
+        puts("Текущая конфигурация не выбрана.\nВыберете пункт создания или импорта конфигураций в меню.");
         system("pause");
         return;
     }
@@ -221,7 +231,7 @@ void change_config() {
 
                 break;
             default:
-                puts("Выбор не распознан :(\nНажмите <enter> и повторите попытку...");
+                puts("Выбор не распознан :(");
                 system("pause");
                 break;
             }
@@ -231,23 +241,177 @@ void change_config() {
             return;
             break;
         default:
-            puts("Выбор не распознан :(\nНажмите <enter> и повторите попытку...");
+            puts("Выбор не распознан :(");
             system("pause");
             break;
         }
     }
 }
 
+
 void save_config() {
+    system("cls");
+    puts("\t\t\tМеню сохранения конфигурации!\n");
+    if (current_config.status == in_progress) {
+        puts("Текущая конфигурация не выбрана.\nВыберете пункт создания или импорта конфигураций в меню.");
+        system("pause");
+        return;
+    }
+    FILE* file;
+    char file_name[100] = {'\0'};
+    puts("Введите имя файла(только латинские буквы, до 15 символов) для сохранения или нажмите 0<enter>, чтобы продолжить.");
+    scanf_s("%s", file_name,(unsigned)sizeof(file_name));
+    if (!strcmp(file_name, "0")) {
+        sprintf(file_name, "m4_config_%d", rand() % 1000 + 1);
+    }
+    clean_stdin();
+    strcat(file_name, ".txt");
+    if (fopen_s(&file, file_name, "rb+") == 0) {
+        printf("Файл \"%s\" уже существует.\n", file_name);
+        system("pause");
+        return;
+    }
+    if(!fopen_s(&file, file_name, "w")){
+        fprintf(file, "%s\n", super_secret_code);
+        fprintf(file, "%d\n", current_config.tactical_bracing);
+        fprintf(file, "%s\n", current_config.scope.base);
+        fprintf(file, "%s\n", current_config.scope.colour);
+        fprintf(file, "%s\n", current_config.barrel);
+        fprintf(file, "%s\n", current_config.barrel_mods);
+        fprintf(file, "%s\n", current_config.underbarrel_mods);
+        fprintf(file, "%s\n", current_config.trigger);
+        fprintf(file, "%c\n", current_config.magazine_holder);
+        fprintf(file, "%s\n", current_config.handle);
+        fprintf(file, "%s\n", current_config.stock);
+        fprintf(file, "%s\n", current_config.tube);
+        fprintf(file, "%s\n", current_config.rifle_case);
+        fprintf(file, "%s\n", current_config.magazine.size);
+        fclose(file);
+        printf("Файл \"%s\" успешно сохранён!", file_name);
+        system("pause");
+        return;
+    }
+    else {
+        puts("Не удалось создать файл.");
+        system("pause");
+        return;
+    }
     return;
 }
 
+void import_config() {
+    system("cls");
+    puts("\t\t\tМеню импорта конфигурации!\n");
+    if (current_config.status == done) {
+        char c = '\0';
+        while (c != '2') {
+            system("cls");
+            puts("\t\t\tМеню импорта конфигурации!\n");
+            puts("Текущая конфигурация уже выбрана.\nХотите перезаписать её?\nВведите\t: 1<Enter>\tвыйти в меню.\n\
+Введите\t: 2<Enter>\tперезаписать.\n");
+            c = safe_input();
+            switch (c) {
+            case '1':
+                return;
+                break;
+            case '2':
+                break;
+            default:
+                puts("Выбор не распознан :(");
+                system("pause");
+                break;
+            }
+        }
+    }
+        FILE* file;
+        char file_name[100] = { '\0' };
+        puts("Ваш файл должен находиться в той же директории, что и исполняемый файл данной утилиты.");
+        puts("Введите имя файла(только латинские буквы, до 15 символов) для импорта.");
+        scanf_s("%s", file_name, (unsigned)sizeof(file_name));
+        clean_stdin();
+        strcat(file_name, ".txt");
+        if (fopen_s(&file, file_name, "rb+") != 0) {
+            printf("Не удалось получить доступ к файлу\"%s\".\n", file_name);
+            system("pause");
+            return;
+        }
+        if (!fopen_s(&file, file_name, "r")) {
+            char line[200] = { '\0' };
+            fgets(line, sizeof(line), file);
+            if (strcmp(line, super_secret_code)) {
+                puts("Выбран неккоректный файл для чтения.");
+                system("pause");
+                return;
+            }
+            while (fgets(line, sizeof(line), file) != NULL) {
+                current_config.tactical_bracing = line[0] - '0';
+            }
+
+        }
+
+        return;
+    }
+
+
+
 void check_prices() {
     system("cls");
-    puts("\t\tПросмотр цен на текущую конфигурацию!\nБазовая стоимость штурмовой винтовки M4 : 20.000 крышек .");
+    puts("\t\tПросмотр цен на текущую конфигурацию!\n\nБазовая стоимость штурмовой винтовки M4 : 20.000 крышек.");
+    current_config.price = 20000;
     if (current_config.tactical_bracing) {
-        printf("Доплата за тактическое крепление : %d", prices[0]);
+        printf("Доплата за тактическое крепление : %d\n", item_price("Тактическое крепление"));
+        current_config.price += item_price("Тактическое крепление");
     }
+    if (strcmp(current_config.scope.base, "Нет")) {
+        printf("Доплата за прицел (%s) : %d\n", current_config.scope.base,item_price(current_config.scope.base));
+        current_config.price += item_price(current_config.scope.base);
+        if (current_config.scope.approach == '4') {
+            printf("Доплата за кратность прицела (4x) : %d\n", item_price("Оптика4х"));
+            current_config.price += item_price("Оптика4х");
+        }
+    }
+    if (strcmp(current_config.barrel, "Обычный")) {
+        printf("Доплата за ствол (%s) : %d\n", current_config.barrel,item_price(current_config.barrel));
+        current_config.price += item_price(current_config.barrel);
+    }
+    if (strcmp(current_config.barrel_mods, "Нет")) {
+        printf("Доплата за модификацию ствола (%s) : %d\n", current_config.barrel_mods, item_price(current_config.barrel_mods));
+        current_config.price += item_price(current_config.barrel_mods);
+    }
+    if (strcmp(current_config.trigger, "Полимер")) {
+        printf("Доплата за материал спусковой скобы (%s) : %d\n", current_config.trigger, item_price(current_config.trigger));
+        current_config.price += item_price(current_config.trigger);
+        if (current_config.magazine_holder) {
+            printf("Доплата за держатель магазина : %d\n", item_price("Держатель магазина"));
+            current_config.price += item_price("Держатель магазина");
+        }
+    }
+    if (strcmp(current_config.underbarrel_mods, "Нет")) {
+        printf("Доплата за модификацию (%s) : %d\n", current_config.underbarrel_mods, item_price(current_config.underbarrel_mods));
+        current_config.price += item_price(current_config.underbarrel_mods);
+    }
+    if (strcmp(current_config.handle, "Нет")) {
+        printf("Доплата за модификацию рукояти (%s) : %d\n", current_config.handle, item_price(current_config.handle));
+        current_config.price += item_price(current_config.handle);
+    }
+    if (strcmp(current_config.stock, "Стандартный")) {
+        printf("Доплата за приклад (%s) : %d\n", current_config.stock, item_price(current_config.stock));
+        current_config.price += item_price(current_config.stock);
+        if (current_config.tube) {
+            printf("Доплата за трубу приклада : %d\n", item_price("С буферизацией отдачи"));
+            current_config.price += item_price("С буферизацией отдачи");
+        }
+    }
+    if (strcmp(current_config.rifle_case, "Нет")) {
+        printf("Доплата за чехол (%s) : %d\n", current_config.rifle_case, item_price(current_config.rifle_case));
+        current_config.price += item_price(current_config.rifle_case);
+    }
+    if (strcmp(current_config.magazine.size, "Стандартный")) {
+        printf("Доплата за магазин (%s) : %d\n", current_config.magazine.size, item_price(current_config.magazine.size));
+        current_config.price += item_price(current_config.magazine.size);
+    }
+    printf("Итоговая цена : %d\n", current_config.price);
+    system("pause");
 
 }
 
@@ -256,17 +420,16 @@ void exit_app() {
     while (1) {
         system("cls");
         puts("\t\tСохранить текущую конфигурацию?\nВведите : 1<Enter>\tда.\nВведите : 2<Enter>\tнет.\n");
-        // clean_stdin();
         choice_safe = safe_input();
         switch (choice_safe) {
         case '1':
             if (current_config.status == 0) {
-                puts("\t\tНикакая конфигурация не выбрана, сохранять нечего.\nНажмите <enter>, чтобы выйти...");
+                puts("\t\tНикакая конфигурация не выбрана, сохранять нечего.");
                 system("pause");
                 return;
             }
             save_config();
-            puts("\t\tКонфигурация успешно сохранена в файл!\nНажмите <enter>, чтобы выйти...");
+            puts("\t\tКонфигурация успешно сохранена в файл!");
             system("pause");
             return;
             break;
@@ -274,8 +437,7 @@ void exit_app() {
             return;
             break;
         default:
-            puts("Выбор не распознан :(\nНажмите <enter> и повторите попытку...");
-            // clean_stdin();
+            puts("Выбор не распознан :(");
             system("pause");
             break;
         }
@@ -295,14 +457,13 @@ void draw_menu() {
 }
 
 int read_prices() {
-    node* list;
     list = (node*)malloc(sizeof(node));
     if (list) {
         list->next = NULL;
     }
     else {
-        puts("Not enough mem");
-        return 0;
+        puts("Недастаточно памяти. . .");
+        return -1;
     }
     FILE* file;
     if (!fopen_s(&file, "price_list.txt", "r")) {
@@ -322,13 +483,26 @@ int read_prices() {
             }
             push(list, name, atoi(price));
         }
+        fclose(file);
     }
     else {
-        puts("Не удалось открыть файл \"price_list.txt\"\nЦены неизвестны...Нажмите <enter> чтобы выйти из программы...");
+        puts("Не удалось открыть файл \"price_list.txt\"\nЦены неизвестны...");
         system("pause");
         return -1;
     }
     return 1;
+}
+
+int item_price(char* name) {
+    node* p;
+    p = list->next;
+    while (p != NULL) {
+        if (!strcmp(p->name, name)) {
+            return p->price;          
+        }
+        p = p->next;
+    }
+    return -1;
 }
 
 char safe_input() {
@@ -342,7 +516,7 @@ char safe_input() {
     return buff[0];
 }
 
-void clean_stdin(void) {
+void clean_stdin() {
     int c;
     do {
         c = getchar();
@@ -367,7 +541,7 @@ void change_tactical_bracing() {
             change++;
             break;
         default:
-            puts("Выбор не распознан :(\nНажмите <enter> и повторите попытку...");
+            puts("Выбор не распознан :(");
             system("pause");
             break;
         }
@@ -406,7 +580,7 @@ void change_scope() {
                     change_tmp++;
                     break;
                 default:
-                    puts("Выбор не распознан :(\nНажмите <enter> и повторите попытку...");
+                    puts("Выбор не распознан :(");
                     system("pause");
                     break;
                 }
@@ -426,15 +600,15 @@ void change_scope() {
                     char choice_temp = safe_input();
                     switch (choice_temp) {
                     case '1':
-                        current_config.scope.approach = 2;
+                        current_config.scope.approach = '2';
                         change_tmp++;
                         break;
                     case '2':
-                        current_config.scope.approach = 4;
+                        current_config.scope.approach = '4';
                         change_tmp++;
                         break;
                     default:
-                        puts("Выбор не распознан :(\nНажмите <enter> и повторите попытку...");
+                        puts("Выбор не распознан :(");
                         system("pause");
                         break;
                     }
@@ -444,15 +618,15 @@ void change_scope() {
                 change++;
                 break;
             }
-            puts("Так как отсутсвует тактическое крепление кратность увеличения только 2х\nНажмите <enter>, чтобы продолжить.");
+            puts("Так как отсутсвует тактическое крепление кратность увеличения только 2х.");
             system("pause");
-            current_config.scope.approach = 2;
+            current_config.scope.approach = '2';
             change_tmp = 0;
             change++;
             break;
 
         default:
-            puts("Выбор не распознан :(\nНажмите <enter> и повторите попытку...");
+            puts("Выбор не распознан :(");
             system("pause");
             break;
         }
@@ -482,7 +656,7 @@ void change_barrel() {
             change++;
             break;
         default:
-            puts("Выбор не распознан :(\nНажмите <enter> и повторите попытку...");
+            puts("Выбор не распознан :(");
             system("pause");
             break;
         }
@@ -506,7 +680,7 @@ void change_barrel() {
                     change_tmp++;
                     break;
                 default:
-                    puts("Выбор не распознан :(\nНажмите <enter> и повторите попытку...");
+                    puts("Выбор не распознан :(");
                     system("pause");
                     break;
                 }
@@ -540,7 +714,7 @@ void change_barrel() {
                 change_tmp++;
                 break;
             default:
-                puts("Выбор не распознан :(\nНажмите <enter> и повторите попытку...");
+                puts("Выбор не распознан :(");
                 system("pause");
                 break;
             }
@@ -563,11 +737,11 @@ void change_trigger() {
         choice = safe_input();
         switch (choice) {
         case '1':
-            strcpy(current_config.trigger, "Полимерная");
+            strcpy(current_config.trigger, "Полимер");
             change++;
             break;
         case '2':
-            strcpy(current_config.trigger, "Алюминиевая");
+            strcpy(current_config.trigger, "Алюминий");
             while (!change_tmp) {
                 system("cls");
                 puts("\t\t\tМеню создания конфигурации!\n");
@@ -584,7 +758,7 @@ void change_trigger() {
                     change_tmp++;
                     break;
                 default:
-                    puts("Выбор не распознан :(\nНажмите <enter> и повторите попытку...");
+                    puts("Выбор не распознан :(");
                     system("pause");
                     break;
                 }
@@ -594,7 +768,7 @@ void change_trigger() {
             change++;
             break;
         default:
-            puts("Выбор не распознан :(\nНажмите <enter> и повторите попытку...");
+            puts("Выбор не распознан :(");
             system("pause");
             break;
         }
@@ -629,7 +803,7 @@ void change_underbarrel_mods() {
             change++;
             break;
         default:
-            puts("Выбор не распознан :(\nНажмите <enter> и повторите попытку...");
+            puts("Выбор не распознан :(");
             system("pause");
             break;
         }
@@ -645,7 +819,7 @@ void change_handle() {
     while (!change) {
         puts("\t\t\tМеню создания конфигурации!\n");
         if (!strcmp(current_config.underbarrel_mods, "Гранатомёт М203")) {
-            puts("Невозможно установить опору, из-за выбранной модификации(Гранатомёт М203)\nНажмите <enter>, чтобы продолжить");
+            puts("Невозможно установить опору, из-за выбранной модификации(Гранатомёт М203).");
             system("pause");
             strcpy(current_config.handle, "Нет");
             change++;
@@ -669,7 +843,7 @@ void change_handle() {
             change++;
             break;
         default:
-            puts("Выбор не распознан :(\nНажмите <enter> и повторите попытку...");
+            puts("Выбор не распознан :(");
             system("pause");
             break;
         }
@@ -700,7 +874,7 @@ void change_stock() {
                 char choice_temp = safe_input();
                 switch (choice_temp) {
                 case '1':
-                    strcpy(current_config.tube, "Стандартная");
+                    strcpy(current_config.tube, "Стандартный");
                     change_tmp++;
                     break;
                 case '2':
@@ -708,7 +882,7 @@ void change_stock() {
                     change_tmp++;
                     break;
                 default:
-                    puts("Выбор не распознан :(\nНажмите <enter> и повторите попытку...");
+                    puts("Выбор не распознан :(");
                     system("pause");
                     break;
                 }
@@ -722,7 +896,7 @@ void change_stock() {
             change++;
             break;
         default:
-            puts("Выбор не распознан :(\nНажмите <enter> и повторите попытку...");
+            puts("Выбор не распознан :(");
             system("pause");
             break;
         }
@@ -748,23 +922,23 @@ void change_case() {
                 system("cls");
                 puts("\t\t\tМеню создания конфигурации!\n");
                 puts("Выберете цвет чехла.");
-                puts("Введите : 1<enter>\t\tЧёрный.\nВведите : 2<enter>\t\tКамуфляж.\nВведите : 3<enter>\t\tРоссия.");
+                puts("Введите : 1<enter>\t\tЧёрный.\nВведите : 2<enter>\t\tРоссия.\nВведите : 3<enter>\t\tРадуга.");
                 char choice_temp = safe_input();
                 switch (choice_temp) {
                 case '1':
-                    strcpy(current_config.rifle_case, "Чёрный");
+                    strcpy(current_config.rifle_case, "Черный");
                     change_tmp++;
                     break;
                 case '2':
-                    strcpy(current_config.rifle_case, "Камуфляж");
+                    strcpy(current_config.rifle_case, "Россия");
                     change_tmp++;
                     break;
                 case '3':
-                    strcpy(current_config.rifle_case, "Камуфляж");
+                    strcpy(current_config.rifle_case, "Радуга");
                     change_tmp++;
                     break;
                 default:
-                    puts("Выбор не распознан :(\nНажмите <enter> и повторите попытку...");
+                    puts("Выбор не распознан :(");
                     system("pause");
                     break;
                 }
@@ -774,7 +948,7 @@ void change_case() {
             change++;
             break;
         default:
-            puts("Выбор не распознан :(\nНажмите <enter> и повторите попытку...");
+            puts("Выбор не распознан :(");
             system("pause");
             break;
         }
@@ -806,7 +980,7 @@ void change_magazine() {
             change++;
             break;
         default:
-            puts("Выбор не распознан :(\nНажмите <enter> и повторите попытку...");
+            puts("Выбор не распознан :(");
             system("pause");
             break;
         }
